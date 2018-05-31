@@ -1,0 +1,2 @@
+recursive-include api_jwt *.py
+
