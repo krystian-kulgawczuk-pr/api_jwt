@@ -1,7 +1,7 @@
 # !/usr/bin/env python
 __version__ = "0.0.1"
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='api_jwt',
