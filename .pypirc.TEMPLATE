@@ -1,0 +1,7 @@
+[distutils]
+index-servers=python-hudya
+
+[python-hudya]
+repository:${PYPI_REPO}
+username:${PYPI_USER}
+password:${PYPI_PASSWORD}
