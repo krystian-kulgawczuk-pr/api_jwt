@@ -10,7 +10,7 @@ setup(
     author='Hudya Team',
     author_email='admin@hudya.io',
     url='https://bitbucket.org/hudya/api_jwt/',
-    packages=['api_jwt', ],
+    py_modules=['api_jwt', ],
     install_requires=[
         'pyjwt>=1.6.1',
     ],

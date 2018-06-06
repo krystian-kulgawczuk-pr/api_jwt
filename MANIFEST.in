@@ -1,2 +1,2 @@
-recursive-include api_jwt *.py
+include *.py
 
