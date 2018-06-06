@@ -12,5 +12,7 @@ RUN pip install --upgrade pip \
 RUN python -m pytest api_jwt_tests.py
 RUN prospector --path=/src --profile=prospector.yml
 
+COPY .pypirc /root/.pypirc
+
 RUN ["chmod", "+x", "entrypoint.sh"]
 ENTRYPOINT '/src/entrypoint.sh'
