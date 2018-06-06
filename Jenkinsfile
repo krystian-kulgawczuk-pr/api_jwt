@@ -50,14 +50,6 @@ stages {
 
   post {
     always {
-      script {
-        try {
-            sh "docker rm -v bumpversion || true"
-            sh "docker rmi -f bumpversion || true"
-        } catch(ex) {
-            echo "problem: ${ex}" // in most cases we don't have image
-        }
-      }
 
       // cleans up workspace
       step([$class: 'WsCleanup'])

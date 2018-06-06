@@ -74,6 +74,8 @@ class APIJwt:
         }
 
         self._ttl = 3600
+        self._public_keys = [self._public_dummy]
+        self._private_key = self._private_dummy
         self.override_keys(public_keys=public_keys, private_key=private_key)
         if ttl:
             self._ttl = ttl
@@ -85,8 +87,7 @@ class APIJwt:
             'id': '',  # entity id
             'exp': datetime.datetime.utcnow(),  # Expiry time for the token
         }
-        self._public_keys = [self._public_dummy]
-        self._private_key = self._private_dummy
+
         # Init extra jwt payload parameters
         for k, v in self._jwt_extras.items():
             if v:
@@ -192,7 +193,7 @@ class APIJwt:
                 payload[k] = v
         return payload
 
-    def encode(self, subject=None, key='user', exp=None, **kwargs):
+    def encode(self, subject=None, key='user', exp=None, **kwargs):  # noqa
         """
         Encode the token
         :param subject: id of identity that is the origin of this token
@@ -237,6 +238,8 @@ class APIJwt:
             elif isinstance(v, (float, int)):
                 payload[k] = str(v)
         # Encode the payload and get token
+        if self._private_key == self._private_dummy:
+            LOG.warning('WARNING!!! Encoding JWT with dummy key!')
         try:
             self._token = jwt.encode(
                 payload,
@@ -247,7 +250,8 @@ class APIJwt:
             self._token = None
             self._valid = False
             self._jwt_issue = True
-            LOG.warning('Not able to encode token due to some bad parameters')
+            LOG.error('Not able to encode token')
+            raise EnvironmentError("Not able to encode token, may be bad private key")
         self._valid = True
         self._expired = False
         self._jwt_issue = False
@@ -276,6 +280,8 @@ class APIJwt:
             self._expired = False
             self._jwt_issue = False
             payload = None
+            if key == self._public_dummy:
+                LOG.warning('WARNING!!! Decoding JWT with dummy key!')
             try:
                 payload = jwt.decode(
                     token,
@@ -293,6 +299,12 @@ class APIJwt:
                 LOG.info('Token has expired.')
                 return None
             except jwt.InvalidTokenError:
+                self._jwt_issue = True
+                self._valid = False
+                self._expired = False
+                LOG.info('Invalid token, unspecified.')
+                return None
+            except jwt.PyJWTError:
                 self._jwt_issue = True
                 self._valid = False
                 self._expired = False
