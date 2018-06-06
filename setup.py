@@ -12,6 +12,6 @@ setup(
     url='https://bitbucket.org/hudya/api_jwt/',
     packages=['api_jwt', ],
     install_requires=[
-        'pyjwt>=1.6.1'
+        'pyjwt>1.5'
     ],
 )
