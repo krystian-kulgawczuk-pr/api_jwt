@@ -3,3 +3,6 @@
 
 # 0.0.2
 - Fix on __init__.py to get modules
+
+# 0.0.3
+- Move to a single module instead of packages
