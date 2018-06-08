@@ -58,6 +58,12 @@ class APIJwt:
                 3.0,  # Multi-factor
                 4.0  # Certificate-level
             ],
+            'dnt': [
+                0,  # or not set - normal user
+                1,  # reservation - don't track this user
+                2,  # not anonymous - don't track and don't store data anonymously
+                3   # Test user - this is a test user, don't skew metrics
+            ],
             'scopes': {
                 'PER_KEY': {  # Use single key with 'PER_KEY' to set allowed values based on key
                     'user': ['user:all'],
@@ -69,7 +75,8 @@ class APIJwt:
         self._jwt_extras = {
             'level': 0.0,  # Authentication level, see _levels for valid levels
             'factor': '',  # Authentication factor used, e.g. password, otp, etc
-            'target': '',
+            'target': '',  # Target id for scopes
+            'dnt': None,   # Do Not Track
             'scopes': [],  # Scopes allowed for this token
         }
 

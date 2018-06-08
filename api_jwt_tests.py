@@ -64,9 +64,10 @@ def test_add_extras():
         allowed={
             'testkey': ['default', 'nr2', 'nr3']
         })
-    eid = str(uuid.uuid4())
+    # Alternative approach:
     # new.set_extras('testkey', 'default')
     # new.set_allowed('testkey', ['default', 'nr2', 'nr3'])
+    eid = str(uuid.uuid4())
     new.encode(eid)
     new.decode(new.jwt)
     assert new.is_valid is True

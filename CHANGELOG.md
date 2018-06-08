@@ -6,3 +6,6 @@
 
 # 0.0.3
 - Move to a single module instead of packages
+
+# 0.0.4
+- Add support for dnt payload (do not track)
