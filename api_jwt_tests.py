@@ -5,7 +5,7 @@ import logging
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from api_jwt import APIJwt
+from .api_jwt import APIJwt
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -114,6 +114,18 @@ def test_extra_float_int():
     assert new2.is_valid is True
     assert new2.level == 1.0
     assert new2.dnt == 3
+
+
+def test_none_values():
+    new = APIJwt()
+    eid = str(uuid.uuid4())
+    new.encode(eid, factor=None, level=None, dnt=None, scopes=['user:all'], exp=3600)
+    assert new.is_expired is False
+    new2 = APIJwt()
+    new2.decode(new.jwt)
+    assert new2.is_valid is True
+    assert new2.factor == ''
+    assert new2.dnt == 0
 
 
 def test_multiple_scopes():

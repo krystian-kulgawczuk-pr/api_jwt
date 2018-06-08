@@ -191,6 +191,8 @@ class APIJwt:
                                     LOG.warning("Mismatch in value, value %s not found in allowed values for key %s", v, k)
                                     raise ValueError('Invalid value, not found in allowed values')
                         else:
+                            if v is None:
+                                continue
                             if v not in allow:
                                 LOG.warning("Mismatch in value, value %s not found in allowed values for key %s", v, k)
                                 raise ValueError('Invalid value, not found in allowed values')
