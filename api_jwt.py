@@ -51,7 +51,7 @@ class APIJwt:
                 'user': 'auth_user',
                 'admin': 'auth_admin'
             },
-            'levels': [
+            'level': [
                 0.0,  # Level 0, no authentication
                 1.0,  # External auth
                 2.0,  # Password/single-factor
@@ -71,12 +71,12 @@ class APIJwt:
                 }
             }
         }
-        # Use None as default to prune item from jwt final token
+        # Use None as default to prune item from jwt final token (only for strings!!!)
         self._jwt_extras = {
-            'level': 0.0,  # Authentication level, see _levels for valid levels
+            'level': 0.0,  # Authentication level, see _allowed for valid levels
             'factor': '',  # Authentication factor used, e.g. password, otp, etc
             'target': '',  # Target id for scopes
-            'dnt': None,   # Do Not Track
+            'dnt': 0,   # Do Not Track
             'scopes': [],  # Scopes allowed for this token
         }
 
@@ -182,16 +182,23 @@ class APIJwt:
                         allow = self._allowed[k]['PER_KEY'][key]  # Use key to find correct allow values
                     else:
                         allow = self._allowed[k]
-                    if not isinstance(v, list):
-                        if isinstance(v, str):
-                            v = [v]
+                    # If we have a list of allowed values
+                    if isinstance(allow, list):
+                        # if we have a list of values supplied
+                        if isinstance(v, list):
+                            for v2 in v:
+                                if v2 not in allow:
+                                    LOG.warning("Mismatch in value, value %s not found in allowed values for key %s", v, k)
+                                    raise ValueError('Invalid value, not found in allowed values')
                         else:
-                            LOG.warning("Mismatch in value, list required for key %s", k)
-                            raise ValueError('Invalid value, a list is expected')
-                    for i in v:
-                        if i not in allow:
-                            LOG.warning("Found list value in key %s that is not in allowed values", k)
-                            raise ValueError('Found an illegal value in the key, i.e. not in allowed')
+                            if v not in allow:
+                                LOG.warning("Mismatch in value, value %s not found in allowed values for key %s", v, k)
+                                raise ValueError('Invalid value, not found in allowed values')
+                            if isinstance(v, float) or isinstance(v, int):
+                                v = str(v)
+                            if isinstance(self._jwt_extras.get(k), list):
+                                v = [v]
+                            payload[k] = str(v)
                 elif not isinstance(v, type(self._allowed[k])):
                     LOG.warning("Mismatch in type for key %s, %s is allowed value", k, str(type(self._allowed[key])))
                     raise ValueError('Mismatch between allowed value type and type for supplied value')
@@ -327,7 +334,12 @@ class APIJwt:
                 if payload.get(k, None):
                     self._user[k] = payload[k].split(',')
             elif payload.get(k, None):
-                self._user[k] = payload[k]
+                if isinstance(self._jwt_extras[k], float):
+                    self._user[k] = float(payload[k])
+                elif isinstance(self._jwt_extras[k], int):
+                    self._user[k] = int(payload[k])
+                else:
+                    self._user[k] = payload[k]
         self._user['exp'] = datetime.datetime.utcfromtimestamp(payload.get('exp', None))
         if self._user['exp'] is None:
             self._expired = True

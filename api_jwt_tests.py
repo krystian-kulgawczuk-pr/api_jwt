@@ -5,7 +5,7 @@ import logging
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from api_jwt import APIJwt
+from .api_jwt import APIJwt
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -91,6 +91,43 @@ def test_expired():
     new2.decode(new.jwt)
     assert new2.is_valid is False
     assert new2.is_expired is True
+
+
+def test_extra_float_int():
+    new = APIJwt()
+    eid = str(uuid.uuid4())
+    new.encode(eid, level=1.0, dnt=3, scopes=['user:all'], exp=3600)
+    assert new.is_expired is False
+    new2 = APIJwt()
+    new2.decode(new.jwt)
+    assert new2.is_valid is True
+    assert new2.level == 1.0
+    assert new2.dnt == 3
+
+
+def test_extra_groups():
+    new = APIJwt()
+    new.set_extras('groups', [])
+    new.set_allowed('groups', [
+        'group1',
+        'group2'
+    ])
+    eid = str(uuid.uuid4())
+    try:
+        new.encode(eid, groups='group3', exp=3600)
+    except ValueError:
+        assert True is True
+    try:
+        new.encode(eid, groups=['group3'], exp=3600)
+    except ValueError:
+        assert True is True
+    new.encode(eid, groups=['group2'], exp=3600)
+    assert new.is_valid is True
+    new2 = APIJwt()
+    new2.set_extras('groups', [])
+    new2.decode(new.jwt)
+    assert new2.is_valid is True
+    assert new2.groups == ['group2']
 
 
 def test_new_keypair(jwt_token):

@@ -9,3 +9,6 @@
 
 # 0.0.4
 - Add support for dnt payload (do not track)
+
+# 0.0.5
+- Fix issues with handling of default types and allowed values (float,int, strings)
