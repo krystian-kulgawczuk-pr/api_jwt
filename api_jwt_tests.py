@@ -5,7 +5,7 @@ import logging
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from .api_jwt import APIJwt
+from api_jwt import APIJwt
 
 logging.basicConfig(level=logging.DEBUG)
 

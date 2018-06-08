@@ -159,7 +159,7 @@ class APIJwt:
         """
         self._allowed[key] = values
 
-    def _add_extras(self, key, **kwargs):
+    def _add_extras(self, key, **kwargs):  # noqa
         """
         Returns a dict with validate extra payload elements
         :param key:
@@ -167,7 +167,7 @@ class APIJwt:
         :return:
         """
         payload = {}
-        for k, v in kwargs.items():
+        for k, v in kwargs.items():   # noqa
             if k not in self._jwt_extras:
                 LOG.warning('%s is not an allowed extra', k)
                 raise AttributeError('Payload element is not an allowed extra in payload')
@@ -194,7 +194,7 @@ class APIJwt:
                             if v not in allow:
                                 LOG.warning("Mismatch in value, value %s not found in allowed values for key %s", v, k)
                                 raise ValueError('Invalid value, not found in allowed values')
-                            if isinstance(v, float) or isinstance(v, int):
+                            if isinstance(v, (float, int)):
                                 v = str(v)
                             if isinstance(self._jwt_extras.get(k), list):
                                 v = [v]
@@ -276,7 +276,7 @@ class APIJwt:
 
         return self._token
 
-    def decode(self, token=None):
+    def decode(self, token=None):  # noqa
         """
         Decode a token, check is_valid, is_bad, an is_expired to get details on results.
         All tokens are verified against the list of public keysl
