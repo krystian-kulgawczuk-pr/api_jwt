@@ -12,3 +12,6 @@
 
 # 0.0.5
 - Fix issues with handling of default types and allowed values (float,int, strings)
+
+# 0.0.6
+- Fix issues in handling of None
