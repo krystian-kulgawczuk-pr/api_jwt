@@ -93,6 +93,17 @@ def test_expired():
     assert new2.is_expired is True
 
 
+def test_extra_factor():
+    new = APIJwt()
+    eid = str(uuid.uuid4())
+    new.encode(eid, factor='something', scopes=['user:all'], exp=3600)
+    assert new.is_expired is False
+    new2 = APIJwt()
+    new2.decode(new.jwt)
+    assert new2.is_valid is True
+    assert new2.factor == 'something'
+
+
 def test_extra_float_int():
     new = APIJwt()
     eid = str(uuid.uuid4())
