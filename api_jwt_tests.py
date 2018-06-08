@@ -116,6 +116,27 @@ def test_extra_float_int():
     assert new2.dnt == 3
 
 
+def test_multiple_scopes():
+    new = APIJwt()
+    new.set_allowed('scopes',
+                    {
+                        'PER_KEY': {
+                            'user': ['user:all'],
+                            'admin': ['admin:all', 'extra']
+                        }
+                    }
+                    )
+    eid = str(uuid.uuid4())
+    new.encode(eid, key='admin', level=1.0, dnt=3, scopes=['extra', 'admin:all'], exp=3600)
+    assert new.is_expired is False
+    new2 = APIJwt()
+    new2.decode(new.jwt)
+    assert new2.is_valid is True
+    assert 'admin:all' in new2.scopes
+    assert 'extra' in new2.scopes
+    assert 'nope' not in new2.scopes
+
+
 def test_extra_groups():
     new = APIJwt()
     new.set_extras('groups', [])
