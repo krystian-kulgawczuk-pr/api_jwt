@@ -15,3 +15,6 @@
 
 # 0.0.6
 - Fix issues in handling of None
+
+# 0.0.7
+- Made crypography a requirement and add exception catching for missing lib

@@ -281,7 +281,7 @@ class APIJwt:
     def decode(self, token=None):  # noqa
         """
         Decode a token, check is_valid, is_bad, an is_expired to get details on results.
-        All tokens are verified against the list of public keysl
+        All tokens are verified against the list of public keys
         :param token: JWT token to decode
         :return: Either None or a dict with the payload
         """
@@ -309,6 +309,12 @@ class APIJwt:
                 self._valid = False
                 LOG.info('Invalid signature.')
                 continue
+            except jwt.exceptions.InvalidAlgorithmError:
+                self._jwt_issue = False
+                self._valid = False
+                self._expired = False
+                LOG.info('Public/private keys unsupported, cryptography/libressl required')
+                return None
             except jwt.exceptions.ExpiredSignatureError:
                 self._valid = False
                 self._expired = True
