@@ -1,18 +1,17 @@
-FROM python:3 as python-base
-MAINTAINER Hudya Admin
+FROM python:alpine3.6
+MAINTAINER Greger Wedel<greger@greger.io>
 
 WORKDIR /src/
 COPY . /src/
 
 # Cache this
-RUN apt-get install libffi-dev
-RUN pip install --upgrade pip \
-    && pip install -U prospector cryptography pytest pyjwt
+RUN apk update \
+    && apk add --no-cache -u build-base linux-headers \
+    libffi-dev libressl-dev
+RUN pip install --upgrade pip pipenv
 
-RUN python -m pytest api_jwt_tests.py
-RUN prospector --path=/src --profile=prospector.yml
+RUN pipenv install --system --dev --ignore-pipfile
 
 COPY .pypirc /root/.pypirc
 
-RUN ["chmod", "+x", "entrypoint.sh"]
-ENTRYPOINT '/src/entrypoint.sh'
+ENTRYPOINT './run.sh'

@@ -7,6 +7,8 @@ LOG = logging.getLogger()
 
 
 class APIJwt:
+    """ Main class to represent a JWT used for API purposes.
+    """
 
     _public_dummy = '-----BEGIN PUBLIC KEY-----\n' \
                     'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzkoXUA7qFoRC/f49OB6Q\n'\
@@ -108,16 +110,16 @@ class APIJwt:
                     self.set_allowed(a, p)
 
     def reset_keys(self):
-        """
-        Reset back the keys to the dummy keys
+        """ Reset back the keys to the dummy keys
+
         :return:
         """
         self._public_keys = [self._public_dummy]
         self._private_key = self._private_dummy
 
     def override_keys(self, public_keys=None, private_key=None):
-        """
-        Override the keys 'on the fly'. Preferred method is at instantiation
+        """ Override the keys 'on the fly'. Preferred method is at instantiation
+
         :param public_keys: list or json list of keys, or single public key for decoding
         :param private_key: private key for encoding
         :return:
@@ -134,8 +136,8 @@ class APIJwt:
             self._private_key = private_key
 
     def add_public_keys(self, keys=None):
-        """
-        Add more public keys
+        """ Add more public keys
+
         :param keys: Single or list of keys (no json allowed)
         """
         if keys is None:
@@ -144,24 +146,24 @@ class APIJwt:
             self._public_keys.append(k)
 
     def set_extras(self, key, default):
-        """
-        Set extra allowed payload parameters
+        """ Set extra allowed payload parameters
+
         :param key: Payload name
         :param default: Default value, None if it should be pruned from jwt if not set
         """
         self._jwt_extras[key] = default
 
     def set_allowed(self, key, values):
-        """
-        Set allowed values for the extras in the payload
+        """ Set allowed values for the extras in the payload
+
         :param key: Payload name
         :param values: Dict for keys and scopes, list for other extras
         """
         self._allowed[key] = values
 
     def _add_extras(self, key, **kwargs):  # noqa
-        """
-        Returns a dict with validate extra payload elements
+        """ Returns a dict with validate extra payload elements
+
         :param key:
         :param kwargs:
         :return:
@@ -188,7 +190,8 @@ class APIJwt:
                         if isinstance(v, list):
                             for v2 in v:
                                 if v2 not in allow:
-                                    LOG.warning("Mismatch in value, value %s not found in allowed values for key %s", v, k)
+                                    LOG.warning("Mismatch in value, value %s not found in allowed values for key %s",
+                                                v, k)
                                     raise ValueError('Invalid value, not found in allowed values')
                         else:
                             if v is None:
@@ -210,8 +213,8 @@ class APIJwt:
         return payload
 
     def encode(self, subject=None, key='user', exp=None, **kwargs):  # noqa
-        """
-        Encode the token
+        """ Encode the token
+
         :param subject: id of identity that is the origin of this token
         :param key: a valid key from _allowed['keys'], typically used in iss to match key on external system
         :param exp: expiry time in seconds
@@ -279,9 +282,9 @@ class APIJwt:
         return self._token
 
     def decode(self, token=None):  # noqa
-        """
-        Decode a token, check is_valid, is_bad, an is_expired to get details on results.
+        """ Decode a token, check is_valid, is_bad, an is_expired to get details on results.
         All tokens are verified against the list of public keys
+        
         :param token: JWT token to decode
         :return: Either None or a dict with the payload
         """
@@ -302,7 +305,7 @@ class APIJwt:
                 payload = jwt.decode(
                     token,
                     key,
-                    algorithm='RS256'
+                    algorithms=['RS256']
                 )
                 break
             except (jwt.exceptions.DecodeError, jwt.exceptions.InvalidSignatureError):
