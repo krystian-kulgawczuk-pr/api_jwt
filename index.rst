@@ -1,7 +1,7 @@
-api_jwt - a Python Library
+api_jwt - JWT tokens for APIs
 =============================================
-This Python library is a simple wrapper around pyjwt to support JWT creation and validation as well
-payload handling (scopes, auth level, etc).
+This Python library is a wrapper around pyjwt to support JWT creation and validation as well
+as payload handling (scopes, auth level, etc).
 
 .. toctree::
    :maxdepth: 2
@@ -10,14 +10,7 @@ payload handling (scopes, auth level, etc).
    LICENSE
    README
    CHANGELOG
-
-api_jwt source module
-----------------------
-
-.. automodule:: api_jwt
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   code-docs
 
 Indices and tables
 ==================

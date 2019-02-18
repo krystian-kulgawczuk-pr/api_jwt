@@ -14,4 +14,5 @@ RUN pipenv install --system --dev --ignore-pipfile
 
 COPY .pypirc /root/.pypirc
 
-ENTRYPOINT './run.sh'
+ENTRYPOINT ["./run.sh"]
+CMD [""]

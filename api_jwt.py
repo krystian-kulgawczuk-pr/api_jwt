@@ -160,13 +160,13 @@ class APIJwt:
                     self.set_allowed(a, p)
 
     def reset_keys(self):
-        """ Reset back the keys to the dummy keys
+        """ Reset back the keys to the dummy keys (both public and private)
         """
         self._public_keys = [self._public_dummy]
         self._private_key = self._private_dummy
 
     def override_keys(self, public_keys=None, private_key=None):
-        """ Override the keys 'on the fly'. Preferred method is at instantiation
+        """ Override the public and private keys 'on the fly'. Preferred method is at instantiation
 
         :param public_keys: list or json list of keys, or single public key for decoding
         :param private_key: private key for encoding
@@ -183,7 +183,7 @@ class APIJwt:
             self._private_key = private_key
 
     def add_public_keys(self, keys=None):
-        """ Add more public keys
+        """ Add more public keys to the list of keys used to validate JWT signature
 
         :param keys: Single or list of keys (no json allowed)
         """
@@ -193,7 +193,7 @@ class APIJwt:
             self._public_keys.append(k)
 
     def set_extras(self, key, default):
-        """ Set extra allowed payload parameters for a token to be encoded
+        """ Set extra allowed payload parameters for encoded tokens
 
         :param key: Payload key name
         :param default: Default value, None if it should be pruned from jwt if not set
@@ -265,10 +265,13 @@ class APIJwt:
         Additional key/value pairs will be validated against extras and the values of each against allowed.
         If an extra does not have a key in allowed, any value except None will be included in the token payload.
 
+        Use kwargs, extras={} or allowed={}, as short-cuts to calling set_allowed() and set_extras() before encode(),
+        i.e. do everything at once in the encode() call.
+
         :param subject: id of the subject of this token
         :param key: a valid key from _allowed['keys'], typically used in iss to match key on external system
         :param exp: expiry time in seconds
-        :param kwargs: key/value pairs to include in the payload. Use extras={} or allowed={} as short-cuts to calling set_allowed() and set_extras() before encode(), i.e. do everything at once
+        :param kwargs: key/value pairs to include in the payload.
         :return: None if not successfully encoded JWT token
         """
         if key not in self._allowed['keys']:
