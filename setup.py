@@ -17,7 +17,7 @@ setup(
     author='Greger Wedel',
     author_email='greger@greger.io',
     license='Apache2',
-    url='https://bitbucket.org/hudya/api_jwt/',
+    url='https://github.com/gregertw/api_jwt',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
