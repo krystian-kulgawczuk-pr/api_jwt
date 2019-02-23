@@ -7,6 +7,58 @@ LOG = logging.getLogger()
 
 
 class APIJwt:
+    """ Main class to represent a JWT used for API purposes. The internal structure of the JWT is
+    set when the class is instantiated. This structure will be used for encode/decode operations.
+    If no parameters are supplied, the defaults are used. If no certificate or key is supplied, a dummy test pair
+    is used, causing a log warning.
+
+    *For the extras parameter (kwargs)*: An extras key that is set to None will be pruned from the JWT. With no extras
+    set, these default extras will be included.  Default extras::
+
+        extras = {
+            'level': 0.0,  # Authentication level, allowed['levels'] specifies the valid levels
+            'factor': '',  # Authentication factor used, e.g. password, otp, etc
+            'target': '',  # Target id for scopes
+            'dnt': 0,      # Do Not Track
+            'scopes': [],  # Scopes this token gives access to
+        }
+
+    *For the allowed parameter (kwargs)*: The allowed dict defines the valid values for each of the extras. If a new
+    extra is to be used, a new key with
+    valid paramters should also be included. The 'keys' and 'scopes' keys are special::
+
+        allowed = {
+            'keys': {
+                'user': 'auth_user',
+                'admin': 'auth_admin'
+            },
+            'level': [
+                0.0,  # Level 0, no authentication
+                1.0,  # Externally authenticated
+                2.0,  # Password/single-factor
+                3.0,  # Multi-factor
+                4.0   # Certificate-level
+            ],
+            'dnt': [
+                0,  # or not set - normal user
+                1,  # reservation - don't track this user
+                2,  # not anonymous - don't track and don't store data anonymously
+                3   # Test user - this is a test user, don't skew metrics
+            ],
+            'scopes': {
+                'PER_KEY': {  # Use single key with 'PER_KEY' to set allowed values based on key
+                    'user': ['user:all'],
+                    'admin': ['admin:all']
+                }
+            }
+        }
+
+    :param public_keys: Single string or list of strings with public pem keys for signing verification
+    :param private_key: Single string with pem key for
+    :param ttl: Default time to live in seconds for the encoded JWT (can be overridden in encode())
+    :param extras: A dict with non-mandatory JWT parameters that will be included in the encoded JWT.
+    :param allowed: A dict with allowed values for keys and scopes and for the extras
+    """
 
     _public_dummy = '-----BEGIN PUBLIC KEY-----\n' \
                     'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzkoXUA7qFoRC/f49OB6Q\n'\
@@ -77,7 +129,7 @@ class APIJwt:
             'factor': '',  # Authentication factor used, e.g. password, otp, etc
             'target': '',  # Target id for scopes
             'dnt': 0,   # Do Not Track
-            'scopes': [],  # Scopes allowed for this token
+            'scopes': [],  # Scopes this token gives access to
         }
 
         self._ttl = 3600
@@ -108,19 +160,16 @@ class APIJwt:
                     self.set_allowed(a, p)
 
     def reset_keys(self):
-        """
-        Reset back the keys to the dummy keys
-        :return:
+        """ Reset back the keys to the dummy keys (both public and private)
         """
         self._public_keys = [self._public_dummy]
         self._private_key = self._private_dummy
 
     def override_keys(self, public_keys=None, private_key=None):
-        """
-        Override the keys 'on the fly'. Preferred method is at instantiation
+        """ Override the public and private keys 'on the fly'. Preferred method is at instantiation
+
         :param public_keys: list or json list of keys, or single public key for decoding
         :param private_key: private key for encoding
-        :return:
         """
         if public_keys:
             if isinstance(public_keys, list):
@@ -134,8 +183,8 @@ class APIJwt:
             self._private_key = private_key
 
     def add_public_keys(self, keys=None):
-        """
-        Add more public keys
+        """ Add more public keys to the list of keys used to validate JWT signature
+
         :param keys: Single or list of keys (no json allowed)
         """
         if keys is None:
@@ -144,24 +193,24 @@ class APIJwt:
             self._public_keys.append(k)
 
     def set_extras(self, key, default):
-        """
-        Set extra allowed payload parameters
-        :param key: Payload name
+        """ Set extra allowed payload parameters for encoded tokens
+
+        :param key: Payload key name
         :param default: Default value, None if it should be pruned from jwt if not set
         """
         self._jwt_extras[key] = default
 
     def set_allowed(self, key, values):
-        """
-        Set allowed values for the extras in the payload
+        """ Set allowed values for the extras in the payload
+
         :param key: Payload name
         :param values: Dict for keys and scopes, list for other extras
         """
         self._allowed[key] = values
 
     def _add_extras(self, key, **kwargs):  # noqa
-        """
-        Returns a dict with validate extra payload elements
+        """ Returns a dict with validated extra payload elements
+
         :param key:
         :param kwargs:
         :return:
@@ -188,7 +237,8 @@ class APIJwt:
                         if isinstance(v, list):
                             for v2 in v:
                                 if v2 not in allow:
-                                    LOG.warning("Mismatch in value, value %s not found in allowed values for key %s", v, k)
+                                    LOG.warning("Mismatch in value, value %s not found in allowed values for key %s",
+                                                v, k)
                                     raise ValueError('Invalid value, not found in allowed values')
                         else:
                             if v is None:
@@ -210,13 +260,19 @@ class APIJwt:
         return payload
 
     def encode(self, subject=None, key='user', exp=None, **kwargs):  # noqa
-        """
-        Encode the token
-        :param subject: id of identity that is the origin of this token
+        """ Encode the token with subject as the identity this token concerns (sub), using key to identify the key type
+        (used by some gateways like kong in the iss parameter) and with exp (or default) expiry in seconds.
+        Additional key/value pairs will be validated against extras and the values of each against allowed.
+        If an extra does not have a key in allowed, any value except None will be included in the token payload.
+
+        Use kwargs, extras={} or allowed={}, as short-cuts to calling set_allowed() and set_extras() before encode(),
+        i.e. do everything at once in the encode() call.
+
+        :param subject: id of the subject of this token
         :param key: a valid key from _allowed['keys'], typically used in iss to match key on external system
         :param exp: expiry time in seconds
-        :param kwargs: extras={} or allowed={} as short-cuts to set_allowed() and set_extras
-        :return: None if not successful or resulting JWT token
+        :param kwargs: key/value pairs to include in the payload.
+        :return: None if not successfully encoded JWT token
         """
         if key not in self._allowed['keys']:
             self._valid = False
@@ -279,11 +335,11 @@ class APIJwt:
         return self._token
 
     def decode(self, token=None):  # noqa
-        """
-        Decode a token, check is_valid, is_bad, an is_expired to get details on results.
+        """ Decode a token, properties is_valid, is_bad, an is_expired will be set.
         All tokens are verified against the list of public keys
+
         :param token: JWT token to decode
-        :return: Either None or a dict with the payload
+        :return: Either None if doken was not successfully decoded or a dict with the payload
         """
         if token is None:
             self._valid = False
@@ -302,7 +358,7 @@ class APIJwt:
                 payload = jwt.decode(
                     token,
                     key,
-                    algorithm='RS256'
+                    algorithms=['RS256']
                 )
                 break
             except (jwt.exceptions.DecodeError, jwt.exceptions.InvalidSignatureError):
@@ -360,18 +416,37 @@ class APIJwt:
 
     @property
     def user(self):
+        """Contains the entire payload of a decoded token
+
+        :return: payload
+        :rtype: dict
+        """
         return self._user
 
     @property
     def jwt(self):
+        """Contains the jwt token
+
+        :return: JWT token
+        :rtype: string
+        """
         return self._token
 
     @property
     def is_valid(self):
+        """Set if decoded a token and contains True if token is valid
+
+        :return: whether token is valid or not
+        :rtype: bool
+        """
         return self._valid
 
     @property
     def is_expired(self):
+        """Set if decoded a token and token was expired
+        :return: Expired token or not
+        :rtype: bool
+        """
         # It may have been expired when we decoded
         if self._expired:
             return self._expired
@@ -384,10 +459,20 @@ class APIJwt:
 
     @property
     def is_bad(self):
+        """Set if decoded a token and token contained errors
+
+        :return: Bad token or not
+        :rtype: bool
+        """
         return self._jwt_issue
 
     @property
     def expiry(self):
+        """Expiry date of the token
+
+        :return: Expiry timestamp for token
+        :rtype: datetime
+        """
         return self._user['exp']
 
     def __getattr__(self, key):

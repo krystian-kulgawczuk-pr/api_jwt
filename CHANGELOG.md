@@ -1,20 +1,6 @@
-# 0.0.1
-- Initial version coming out of auth ms refactoring
+#CHANGELOG
 
-# 0.0.2
-- Fix on __init__.py to get modules
+Feb 18, 2019
+------------
 
-# 0.0.3
-- Move to a single module instead of packages
-
-# 0.0.4
-- Add support for dnt payload (do not track)
-
-# 0.0.5
-- Fix issues with handling of default types and allowed values (float,int, strings)
-
-# 0.0.6
-- Fix issues in handling of None
-
-# 0.0.7
-- Made crypography a requirement and add exception catching for missing lib
+- Open-sourced library at 1.2.0, reflecting multiple internal releases

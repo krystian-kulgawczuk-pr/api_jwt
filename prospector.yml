@@ -8,6 +8,7 @@ ignore-patterns:
   - migrations
   - static
   - docs
+  - conf.py
 
 pyroma:
   run: false

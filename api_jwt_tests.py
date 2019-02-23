@@ -160,11 +160,11 @@ def test_extra_groups():
     try:
         new.encode(eid, groups='group3', exp=3600)
     except ValueError:
-        assert True is True
+        assert True is True  # noqa
     try:
         new.encode(eid, groups=['group3'], exp=3600)
     except ValueError:
-        assert True is True
+        assert True is True  # noqa
     new.encode(eid, groups=['group2'], exp=3600)
     assert new.is_valid is True
     new2 = APIJwt()
