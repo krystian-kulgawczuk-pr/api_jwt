@@ -14,6 +14,7 @@
 #
 import os
 import sys
+from recommonmark.parser import CommonMarkParser
 sys.path.insert(0, os.path.abspath('.'))
 
 
@@ -52,11 +53,12 @@ templates_path = ['_templates']
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = {
-    '.rst': 'restructuredtext',
-    '.txt': 'markdown',
-    '.md': 'markdown',
+source_suffix = ['.rst', '.txt', '.md']
+
+source_parsers = {
+    '.md': CommonMarkParser,
 }
+
 # The master toctree document.
 master_doc = 'index'
 
