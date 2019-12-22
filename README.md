@@ -29,10 +29,8 @@ decode.
 
 Example wrapper where you add set your own configuration parameters
 
-    from api_jwt import APIJwt
-    
+    from api_jwt import APIJwt 
     class HudyaJWT(APIJwt):
-    
         def __init__(self, *args, **kwargs):
             if settings.JWT_KEY_PRIVATE:  # This could be loaded from os.env(), it should be base64 encoded
                                           # It should be in pem format and not be encrypted
@@ -103,6 +101,8 @@ Decoding is super-simple:
         print("Access granted!")
 
 ## How to release
+
+Remember to update version in setup.py.
 
 Running `docker-compose up -d` without env var COMMAND set will start up the container and run run.sh, which
 will result in the tests being run and the container be kept running for subsequent docker exec commands.

@@ -1,5 +1,12 @@
 # CHANGELOG
 
+Dec 22, 2019
+------------
+
+- Bump version to 1.2.1
+- Upgrade to latest cryptography library and its dependencies
+- Fix rendering of readme at pypi.org
+
 Feb 23, 2019
 ------------
 

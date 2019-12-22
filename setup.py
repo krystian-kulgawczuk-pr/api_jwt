@@ -1,5 +1,5 @@
 # !/usr/bin/env python
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 
 from setuptools import setup
 
@@ -13,6 +13,7 @@ setup(
     name='api_jwt',
     version=__version__,
     description='Library for JWT encoding/decoding specifically adapted to use in APIs',
+    long_description_content_type="text/markdown",
     long_description=readme(),
     author='Greger Wedel',
     author_email='greger@greger.io',

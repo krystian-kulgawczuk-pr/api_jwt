@@ -7,13 +7,15 @@ name = "pypi"
 cryptography = "*"
 pyjwt = ">=1.6.1"
 
-
 [dev-packages]
 prospector = "*"
 pytest = "*"
 twine = "*"
 sphinx = "*"
 recommonmark = "*"
+pylint = "*"
+keyring = "*"
+jeepney = "*"
 
 [requires]
 python_version = "3.6"

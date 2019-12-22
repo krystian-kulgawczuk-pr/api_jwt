@@ -226,7 +226,7 @@ class APIJwt:
                         v not in self._allowed[k]:
                     LOG.warning('%s is not an allowed value for key %s', str(v), str(k))
                     raise ValueError('Value is not allowed in key')
-                elif 'PER_KEY' in self._allowed[k] or isinstance(self._allowed[k], list):
+                if 'PER_KEY' in self._allowed[k] or isinstance(self._allowed[k], list):
                     if 'PER_KEY' in self._allowed[k]:
                         allow = self._allowed[k]['PER_KEY'][key]  # Use key to find correct allow values
                     else:
