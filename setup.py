@@ -26,7 +26,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
     ],
-    py_modules=['api_jwt', ],
+    py_modules=['api_jwt_2', ],
     install_requires=[
         'pyjwt>=1.6.1',
         'cryptography',
