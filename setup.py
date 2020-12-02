@@ -18,7 +18,7 @@ setup(
     author='Greger Wedel',
     author_email='greger@greger.io',
     license='Apache2',
-    url='https://github.com/gregertw/api_jwt',
+    url='https://github.com/krystian-kulgawczuk-pr/api_jwt',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',

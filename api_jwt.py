@@ -358,7 +358,8 @@ class APIJwt:
                 payload = jwt.decode(
                     token,
                     key,
-                    algorithms=['RS256']
+                    algorithms=['RS256'],
+                    audience='aud',
                 )
                 break
             except (jwt.exceptions.DecodeError, jwt.exceptions.InvalidSignatureError):
