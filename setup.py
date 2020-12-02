@@ -10,7 +10,7 @@ def readme():
 
 
 setup(
-    name='api_jwt',
+    name='api_jwt_2',
     version=__version__,
     description='Library for JWT encoding/decoding specifically adapted to use in APIs',
     long_description_content_type="text/markdown",
